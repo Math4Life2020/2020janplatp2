@@ -1,12 +1,12 @@
-#include <bits/stdc++.h>
+#include <bits/stdc++.h> //AC with runtime ~1300ms on the worst case
 using namespace std;
-#pragma GCC optimize("O3,unroll-loops,strict-overflow,Ofast")
-#pragma GCC target("avx2,abm,bmi,bmi2,sse4")
+#pragma GCC optimize("O3,unroll-loops,strict-overflow,Ofast") //pragma build is not necessary to AC and only shaves ~200ms on the worst cases (~1500ms -> ~1300ms)
+#pragma GCC target("avx2,abm,bmi,bmi2,sse4") //to be completely honest, I have no clue what half of these do
 
 using ll = long long; using pii = pair<ll,ll>;
 const ll p = 1e9+7;
 const ll Nm = 65536;
-const ll E = 16;
+const ll E = 16; //log2(Nm)
 const ll K = 20;
 
 ll v2(ll x) {
@@ -16,16 +16,16 @@ ll v2(ll x) {
 	return __builtin_ctz(x);
 }
 
-struct mtr {
+struct mtr { //matrix for each component
 	bool emp;
 	int mv[K][K]; //matrix values
 };
 
-struct vtr {
+struct vtr { //vector (for vector-matrix multiplications)
 	ll vv[K];
 };
 
-mtr mtr0(ll x) {
+mtr mtr0(ll x) { //matrix initializer
 	mtr M;
 	if (x==-1) {
 		M.emp=1;
@@ -47,7 +47,7 @@ mtr mtr0(ll x) {
 	return M;
 }
 
-vtr vtr0() {
+vtr vtr0() { //vector iniitalizer
 	vtr V;
 	for (ll i=1;i<K;i++) {
 		V.vv[i]=0;
@@ -56,7 +56,7 @@ vtr vtr0() {
 	return V;
 }
 
-mtr prd(mtr m1, mtr m2) {
+mtr prd(mtr m1, mtr m2) { //matrix-matrix product
 	if (m2.emp) {
 		return m1;
 	}
@@ -71,7 +71,6 @@ mtr prd(mtr m1, mtr m2) {
 	for (ll k=0;k<K;k++) {
 		for (ll j=0;j<=k;j++) {
 			for (ll i=0;i<=j;i++) {
-				//M.mv[i][k]=((ll)M.mv[i][k]+(ll)m1.mv[i][j]*(ll)m2.mv[j][k])%p;
 				prdarr[i][k] += (ll)m1.mv[i][j]*(ll)m2.mv[j][k];
 			}
 		}
@@ -84,7 +83,7 @@ mtr prd(mtr m1, mtr m2) {
 	return M;
 }
 
-vtr prdV(vtr v1, mtr m1) {
+vtr prdV(vtr v1, mtr m1) { //vector-matrix product; this is the bottleneck of the code
 	vtr V;
 	for (ll i=0;i<K;i++) {
 		V.vv[i]=0;
@@ -92,8 +91,8 @@ vtr prdV(vtr v1, mtr m1) {
 	for (ll j=0;j<K;j++) {
 		for (ll i=0;i<=j;i++) {
 			V.vv[j] = (V.vv[j]+v1.vv[i]*(ll)m1.mv[i][j]);
-			if ((i&7)==0) {
-				V.vv[j]%=p;
+			if ((i&7)==0) { //taking modulo is the slowest operation here; doing it on each i-value gives TLE
+				V.vv[j]%=p; //this uses ~1/8 the number of modulo operations (not including it in the loop here (aka only at the end) gives WA)
 			}
 		}
 	}
@@ -111,7 +110,7 @@ ll sumv(vtr v1) {
 	return val;
 }
 
-mtr st[2*Nm];
+mtr st[2*Nm]; //segment tree
 
 int main() {
 	ios_base::sync_with_stdio(false); cin.tie(0);
@@ -128,13 +127,13 @@ int main() {
 		st[Nm+i]=mtr0(-1);
 	}
 	for (ll i=(Nm-1);i>=1;i--) {
-		st[i]=prd(st[2*i],st[2*i+1]);
+		st[i]=prd(st[2*i],st[2*i+1]); //constructs segtree of matrices
 	}
 	ll Q; cin >> Q;
 	for (ll q=0;q<Q;q++) {
 		ll l,r; cin >> l >> r;
 		l--; r--;
-		vtr v1 = vinit;
+		vtr v1 = vinit; //starts with the vector [1,0,0,0,...,0] and then multiplies it by the matrices (in the segtree)
 		deque<ll> e1,e2;
 		while (l<=r) {
 			if (v2(l)<=v2(r+1)) {
