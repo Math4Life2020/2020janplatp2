@@ -47,7 +47,7 @@ mtr mtr0(ll x) { //matrix initializer
 	return M;
 }
 
-vtr vtr0() { //vector iniitalizer
+vtr vtr0() { //vector initializer
 	vtr V;
 	for (ll i=1;i<K;i++) {
 		V.vv[i]=0;
