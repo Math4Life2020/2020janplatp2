@@ -1,5 +1,5 @@
 #include <bits/stdc++.h> //AC with runtime ~1300ms on the worst case
-using namespace std;
+using namespace std; //time complexity is O(NK^3+QK^2log(N)) with a blazing fast (?) constant factor
 #pragma GCC optimize("O3,unroll-loops,strict-overflow,Ofast") //pragma build is not necessary to AC and only shaves ~200ms on the worst cases (~1500ms -> ~1300ms)
 #pragma GCC target("avx2,abm,bmi,bmi2,sse4") //to be completely honest, I have no clue what half of these do
 
