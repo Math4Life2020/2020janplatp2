@@ -17,7 +17,7 @@ ll v2(ll x) {
 }
 
 struct mtr { //matrix for each component
-	bool emp;
+	bool emp; //is empty?
 	int mv[K][K]; //matrix values
 };
 
